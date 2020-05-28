@@ -1,0 +1,19 @@
+{
+  "name": "json-schema-toolbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "binary-split": "^1.0.5",
+    "is-my-json-valid": "^2.20.0",
+    "kleur": "^3.0.3",
+    "lodash": "^4.17.15",
+    "prompts": "^2.3.2",
+    "yargs": "^15.3.1"
+  }
+}
