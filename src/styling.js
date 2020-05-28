@@ -51,9 +51,26 @@ function summaryField(field, types, required = false, indent = 2) {
 }
 
 
+function validationError(schema, field, type, message, schemaPath = []) {
+  let prop = _.get(schema, schemaPath)
+
+  if (type && message !== 'is required') {
+    let expectedType = formatArray(_.castArray(type), colors.errors.extra, colors.plain(', '))
+    message = `${message}. ${colors.plain('Expected type')} ${expectedType}`
+  } else if (message.indexOf('enum value') > -1) {
+    let enumV = prop.enum.map(JSON.stringify)
+    let enumStr = formatArray(enumV, colors.errors.extra, colors.plain(', '))
+    message = `${message}. ${colors.plain('Allowed values:')} ${enumStr}`
+  }
+
+  return `${colors.errors.message('Field')} ${colors.errors.field(field)} ${colors.errors.message(message)}`
+}
+
+
 module.exports = {
   colors,
   symbols,
   formatArray,
   summaryField,
+  validationError,
 }
