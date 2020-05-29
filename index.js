@@ -1,7 +1,8 @@
+#!/usr/bin/env node
+
 const prompts = require('prompts')
 const _ = require('lodash')
 const yargs = require('yargs')
-
 
 yargs
   .options({})
@@ -30,3 +31,4 @@ yargs
   .version()
   .help()
   .parse()
+
