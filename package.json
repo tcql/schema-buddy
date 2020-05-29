@@ -15,6 +15,7 @@
     "binary-split": "^1.0.5",
     "glob": "^7.1.6",
     "is-my-json-valid": "^2.20.0",
+    "json-schema-faker": "^0.5.0-rcv.24",
     "kleur": "^3.0.3",
     "lodash": "^4.17.15",
     "prompts": "^2.3.2",

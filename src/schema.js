@@ -58,6 +58,11 @@ function summarize(schemaInfo) {
     .map(p => summaryField(p.__key, p.__type, p.__required))
     .join('\n')
 
+  // TODO:
+  // - use templating instead of a bunch of console.log'ing
+  // - remove custom property information (isPublic) and/or provide some way to extract
+  //   additional properties for summaries
+  // - handle if the schema itself is not valid
   console.log('')
   console.log(kleur.white().bold('Schema Summary'))
   console.log(kleur.bold('--------------'))

@@ -13,8 +13,9 @@ yargs
         name: 'command',
         message: 'What would you like to do?',
         choices: [
+          // TODO: list from commands folder?
           { title: 'Validate an event against a schema', value: 'validate' },
-          // { title: 'See an example event for a schema', value: 'example', disabled: true },
+          { title: 'See an example event for a schema', value: 'example' },
           { title: 'Summarize a schema', value: 'summarize' }
         ]
       }
