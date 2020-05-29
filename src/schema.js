@@ -5,7 +5,8 @@ const kleur = require('kleur')
 const {
   colors,
   symbols,
-  summaryField
+  summaryField,
+  headerProperty,
 } = require('./styling')
 
 
@@ -41,11 +42,54 @@ async function load(schemafile) {
 }
 
 
+// todo: extract to utils
+function _sortedKeyPairs(obj) {
+  return _.chain(obj)
+    .toPairs()
+    .map(_.partial(_.zipObject, ['prop', 'value']))
+    .sortBy('prop')
+}
+
+function summaryHeaderProperties(schema) {
+  const corePropNames = [
+    '$id',
+    '$schema',
+    'title',
+    'description',
+    'additionalProperties',
+  ]
+
+  // we assume schema is an object type
+  // so we're ignoring object specific keys
+  // that we don't want to print, plus some
+  // others that aren't as immediately useful
+  const ignoredPropNames = [
+    'type',
+    'properties',
+    'propertyNames',
+    'required',
+    'dependencies',
+    'patternProperties',
+  ]
+  const nonUserPropNames = _.concat(corePropNames, ignoredPropNames)
+
+  const coreProperties = _sortedKeyPairs(_.pick(schema, corePropNames))
+  const userProperties = _sortedKeyPairs(_.omit(schema, nonUserPropNames))
+
+  return {coreProperties, userProperties}
+}
+
+// TODO: dereferencing schema to get full properties
 function summarize(schemaInfo) {
   const schema = schemaInfo.schema
-  const {required, additionalProperties, isPublic, version} = schema
+  const {required} = schema
 
-  // todo: SIMPLIFY more?
+  // TODO:
+  // - SIMPLIFY ?
+  // - handle displaying property dependencies
+  // - dereferencing schema to get full properties
+  // - traverse dependencies for additional properties
+
   const props = _.chain(schema.properties)
     .map((prop, key) => ({ __key: key, ...prop }))
     .map(({enum: e, ...prop}) => ({ ...prop, __e: e ? e.map(JSON.stringify) : [] })) // enum -> quoted/"literal" values
@@ -58,6 +102,19 @@ function summarize(schemaInfo) {
     .map(p => summaryField(p.__key, p.__type, p.__required))
     .join('\n')
 
+  const {
+    userProperties,
+    coreProperties
+  } = summaryHeaderProperties(schema)
+
+  const corePropsPrintable = coreProperties
+    .map(({prop: p, value: v}) => headerProperty(p, v))
+    .join('\n')
+
+  const userPropsPrintable = userProperties
+    .map(({prop: p, value: v}) => headerProperty(p, v))
+    .join('\n')
+
   // TODO:
   // - use templating instead of a bunch of console.log'ing
   // - remove custom property information (isPublic) and/or provide some way to extract
@@ -66,11 +123,14 @@ function summarize(schemaInfo) {
   console.log('')
   console.log(kleur.white().bold('Schema Summary'))
   console.log(kleur.bold('--------------'))
-  console.log('Version:', kleur.yellow(version))
-  console.log('Is public?', isPublic ? symbols.yes : symbols.no)
-  console.log('Allows additional properties:', additionalProperties ? symbols.yes : symbols.no)
+  console.log()
+  console.log(colors.highlight('[core metadata]'))
+  console.log(corePropsPrintable.value())
+  console.log()
+  console.log(colors.highlight('[user metadata]'))
+  console.log(userPropsPrintable.value())
   console.log('')
-  console.log('Fields:')
+  console.log(colors.highlight('[fields]'))
   console.log(propsPrintable.value())
   console.log('')
 }

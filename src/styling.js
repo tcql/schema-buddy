@@ -11,6 +11,10 @@ const colors = {
     field: kleur.cyan,
     requiredField: kleur.bold().cyan,
     fieldType: kleur.italic().yellow,
+
+    headerProperty: kleur.white,
+    headerValue: kleur.yellow,
+    headerValueList: kleur.italic().yellow,
   },
 
   // validation errors
@@ -51,6 +55,27 @@ function summaryField(field, types, required = false, indent = 2) {
 }
 
 
+function headerProperty(prop, value) {
+  let propStyled = colors.summary.headerProperty(prop)
+  let valueStyled;
+  if (_.isBoolean(value)) {
+    valueStyled = value ? symbols.yes : symbols.no
+  } else if (_.isArray(value)) {
+    valueStyled = formatArray(
+      value,
+      colors.summary.headerValueList,
+      symbols.listSeparator
+    )
+  } else if (_.isObject(value)) {
+    // TODO: better handling
+    valueStyled = JSON.stringify(value)
+  } else {
+    valueStyled = colors.summary.headerValue(value)
+  }
+  return `${prop}: ${valueStyled}`
+}
+
+
 function validationError(schema, field, type, message, schemaPath = []) {
   let prop = _.get(schema, schemaPath)
 
@@ -72,5 +97,6 @@ module.exports = {
   symbols,
   formatArray,
   summaryField,
+  headerProperty,
   validationError,
 }
