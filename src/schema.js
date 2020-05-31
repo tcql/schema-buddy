@@ -75,7 +75,6 @@ function summaryHeaderProperties(schema) {
 
   const coreProperties = _sortedKeyPairs(_.pick(schema, corePropNames))
   const userProperties = _sortedKeyPairs(_.omit(schema, nonUserPropNames))
-
   return {coreProperties, userProperties}
 }
 
@@ -89,48 +88,24 @@ function summarize(schemaInfo) {
   // - handle displaying property dependencies
   // - dereferencing schema to get full properties
   // - traverse dependencies for additional properties
-
   const props = _.chain(schema.properties)
     .map((prop, key) => ({ __key: key, ...prop }))
     .map(({enum: e, ...prop}) => ({ ...prop, __e: e ? e.map(JSON.stringify) : [] })) // enum -> quoted/"literal" values
     .map(({type: t, ...prop}) => ({ ...prop, __type: _.castArray(t) })) // cast type -> array of types, if not already
     .map(({__type: t, __e: e, ...prop}) => ({ ...prop, __type: e.length > 0 ? e : t })) // normalize (enum or type) -> type
     .map(({__key: k, ...prop}) => ({...prop, __key: k, __required: _.includes(required, k)})) // tag as required or not
-
-  const propsPrintable = props
     .orderBy(['__required', '__key'], ['desc', 'asc'])
-    .map(p => summaryField(p.__key, p.__type, p.__required))
-    .join('\n')
 
   const {
     userProperties,
     coreProperties
   } = summaryHeaderProperties(schema)
 
-  const corePropsPrintable = coreProperties
-    .map(({prop: p, value: v}) => headerProperty(p, v))
-    .join('\n')
-
-  const userPropsPrintable = userProperties
-    .map(({prop: p, value: v}) => headerProperty(p, v))
-    .join('\n')
-
-  // TODO:
-  // - use templating instead of a bunch of console.log'ing
-  // - handle if the schema itself is not valid
-  console.log('')
-  console.log(kleur.white().bold('Schema Summary'))
-  console.log(kleur.bold('--------------'))
-  console.log()
-  console.log(colors.highlight('[core metadata]'))
-  console.log(corePropsPrintable.value())
-  console.log()
-  console.log(colors.highlight('[user metadata]'))
-  console.log(userPropsPrintable.value())
-  console.log('')
-  console.log(colors.highlight('[fields]'))
-  console.log(propsPrintable.value())
-  console.log('')
+  return {
+    core: coreProperties.value(),
+    user: userProperties.value(),
+    fields: props.value()
+  }
 }
 
 
