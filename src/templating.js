@@ -8,8 +8,7 @@ const {
   formats,
   formatArray,
 } = require('./styling')
-
-const tmplCache = {}
+const glob = require('glob')
 
 
 function mapDeep(obj, kpath=null) {
@@ -46,7 +45,6 @@ function init() {
   Handlebars.registerHelper('json', JSON.stringify)
   Handlebars.registerHelper('array', formatArray)
   Handlebars.registerHelper('replace', function(options) {
-    console.log("replace:",options)
     const {split, join} = options.hash
     let out = options.fn(this)
     return out.replace(new RegExp(split, 'g'), join)
@@ -74,28 +72,35 @@ function init() {
     let ctx = _.isEmpty(options.hash) ? options.data.root : options.hash
     return render(tmpl, ctx)
   })
-}
 
-
-function load(tmpl) {
-  if (!tmplCache[tmpl]) {
-    const tmplClean = tmpl.replace(/\./g, '/')
-    const loc = path.resolve(`./templates/${tmplClean}.hbs`)
-    const content = fs.readFileSync(loc, "utf-8").replace(/[\n]+$/g, "")
-    const compiled = Handlebars.compile(content)
-    tmplCache[tmpl] = compiled
-  }
-  return tmplCache[tmpl]
+  loadAllViews()
 }
 
 
 function render(tmpl, ctx) {
-  return load(tmpl)(ctx)
+  return Handlebars.partials[tmpl](ctx)
+}
+
+
+function loadAllViews() {
+  const views = glob.sync('./views/**/*.hbs')
+  views
+    .map(v => {
+      let name = v
+        .replace("./views/", "")
+        .replace('.hbs', "")
+        .replace(/\//g, ".")
+      return {name: name, path: v}
+    })
+    .forEach(({name: n, path: p}) => {
+      const content = fs.readFileSync(p, "utf-8")
+        .replace(/[\n]+$/g, "")
+      Handlebars.registerPartial(n, Handlebars.compile(content))
+    })
 }
 
 
 module.exports = {
   init,
-  load,
   render,
 }

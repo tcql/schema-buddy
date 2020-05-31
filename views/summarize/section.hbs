@@ -1,9 +1,9 @@
 {{#c:highlight}}[ {{name}} ]{{/c:highlight}}
 {{#each elements}}{{#replace split="\n" join=""}}{{#dedent 4}}
   {{#if ../isFields}}
-    {{{render "summarize.field" key=__key type=__type required=__required}}}
+    {{> summarize.field key=__key type=__type required=__required}}
   {{else}}
-    {{{render "summarize.metadata" prop=prop value=value}}}
+    {{> summarize.metadata prop=prop value=value}}
   {{/if}}
 {{/dedent}}{{/replace}}
 {{/each}}
