@@ -3,7 +3,7 @@
   {{#if ../isFields}}
     {{> summarize.field key=__key type=__type required=__required}}
   {{else}}
-    {{> summarize.metadata prop=prop value=value}}
+    {{> summarize.metadata key=key value=value}}
   {{/if}}
 {{/dedent}}{{/replace}}
 {{/each}}

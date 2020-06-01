@@ -42,6 +42,10 @@ function init() {
   generateHelpers('c', mapDeep(colors))
   generateHelpers('s', mapDeep(symbols))
   generateHelpers('f', mapDeep(formats))
+
+  Handlebars.registerHelper('matches', function(value, expr) {
+    return value.indexOf(expr) > -1
+  })
   Handlebars.registerHelper('json', JSON.stringify)
   Handlebars.registerHelper('array', formatArray)
   Handlebars.registerHelper('replace', function(options) {
@@ -61,7 +65,7 @@ function init() {
   Handlebars.registerHelper('redent', function (level, options) {
     if (!level && level !== 0) level = 2
     const out = options.fn(this)
-    const rexp = new RegExp("^\\s+")
+    const rexp = new RegExp("^\\s+", 'g')
     const replace = _.fill(_.range(level), " ").join("")
     return out
       .split('\n')
@@ -72,6 +76,7 @@ function init() {
     let ctx = _.isEmpty(options.hash) ? options.data.root : options.hash
     return render(tmpl, ctx)
   })
+  Handlebars.registerHelper('br', () => "")
 
   loadAllViews()
 }

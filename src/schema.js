@@ -46,8 +46,8 @@ async function load(schemafile) {
 function _sortedKeyPairs(obj) {
   return _.chain(obj)
     .toPairs()
-    .map(_.partial(_.zipObject, ['prop', 'value']))
-    .sortBy('prop')
+    .map(_.partial(_.zipObject, ['key', 'value']))
+    .sortBy('key')
 }
 
 function summaryHeaderProperties(schema) {

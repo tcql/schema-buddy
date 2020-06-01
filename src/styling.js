@@ -18,18 +18,10 @@ const colors = {
       type: kleur.italic().yellow,
       required: kleur.bold().cyan
     },
-    field: kleur.cyan,
-    requiredField: kleur.bold().cyan,
-    fieldType: kleur.italic().yellow,
-
-    header: {
+    metadata: {
       key: kleur.white,
       value: kleur.yellow,
     },
-    // todo: remove
-    // headerProperty: kleur.white,
-    // headerValue: kleur.yellow,
-    // headerValueList: kleur.italic().yellow,
   },
 
   // validation errors
@@ -58,12 +50,12 @@ const symbols = {
 // required to format a field
 const formats = {
   summary: {
-    header: {
-      key: colors.summary.header.key,
+    metadata: {
+      key: colors.summary.metadata.key,
       value: _.partialRight(
         formatValue,
-        colors.summary.header.value,
-        colors.summary.header.value().italic,
+        colors.summary.metadata.value,
+        colors.summary.metadata.value().italic,
         symbols.listSeparator
       ),
     },
@@ -75,7 +67,15 @@ const formats = {
         colors.summary.fields.type,
         symbols.listSeparator
       ),
-    }
+    },
+  },
+  errors: {
+    type: _.partialRight(
+      formatValue,
+      colors.errors.extra,
+      colors.errors.extra,
+      symbols.listSeparator
+    ),
   }
 }
 
@@ -117,39 +117,6 @@ function formatArray (arr, itemStyle, separator = null) {
 }
 
 
-function summaryField(field, types, required = false, indent = 2) {
-  // required fields show a symbol at the star, so they have 1 fewer indents
-  let spaces = "".padStart(required ? (indent - 1) : indent)
-  let typeStyled = formatArray(types, colors.summary.fieldType, symbols.listSeparator)
-  let fieldStyled = required ?
-    `${symbols.yes}${spaces}${colors.summary.requiredField(field)}` :
-    `${spaces}${colors.summary.field(field)}`
-
-  return `${fieldStyled} ${typeStyled}`
-}
-
-
-// function headerProperty(prop, value) {
-//   let propStyled = colors.summary.headerProperty(prop)
-//   let valueStyled;
-//   if (_.isBoolean(value)) {
-//     valueStyled = value ? symbols.yes : symbols.no
-//   } else if (_.isArray(value)) {
-//     valueStyled = formatArray(
-//       value,
-//       colors.summary.headerValueList,
-//       symbols.listSeparator
-//     )
-//   } else if (_.isObject(value)) {
-//     // TODO: better handling
-//     valueStyled = JSON.stringify(value)
-//   } else {
-//     valueStyled = colors.summary.headerValue(value)
-//   }
-//   return `${prop}: ${valueStyled}`
-// }
-
-
 function validationError(schema, field, type, message, schemaPath = []) {
   let prop = _.get(schema, schemaPath)
 
@@ -171,7 +138,5 @@ module.exports = {
   symbols,
   formats,
   formatArray,
-  summaryField,
-  // headerProperty,
   validationError,
 }

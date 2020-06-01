@@ -3,6 +3,7 @@ const {summarize} = require('../schema')
 const v = require('is-my-json-valid')
 const kleur = require('kleur')
 const _ = require('lodash')
+const {render} = require('../templating')
 const {
   colors,
   symbols,
@@ -56,11 +57,6 @@ exports.handler = async (argv) => {
 
   const validator = v(schema, {verbose: true})
   let tested = validator(input.event)
-  if (tested) {
-    console.log(symbols.yes, 'The event is valid')
-  } else {
-    console.log(symbols.no, 'The event is invalid. Errors:')
-  }
 
   let errors = _.chain(validator.errors)
     .sortBy('field')
@@ -72,11 +68,5 @@ exports.handler = async (argv) => {
       }
       return e
     })
-
-    let printableErrors = errors
-      .map(e => validationError(schema, e.field, e.type, e.message, e.schemaPath))
-      .join('\n')
-
-    console.log(printableErrors.value())
-    console.log("")
+    console.log(render("validation", {valid: tested, errors: errors}))
 }
