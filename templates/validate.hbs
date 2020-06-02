@@ -1,0 +1,9 @@
+{{#if valid}}
+{{$s:yes}} The event is valid
+{{else}}
+{{$s:no}} The event is invalid
+{{/if}}
+
+{{#each errors}}
+{{{?message this ../schema}}}
+{{/each}}

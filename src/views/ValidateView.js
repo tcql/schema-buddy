@@ -6,6 +6,21 @@ const {
 } = require('../styling')
 
 class ValidateView extends BaseView {
+
+  get templateName() {
+    return "validate"
+  }
+
+
+  "?message" ({message: m, field: f, type: t, schemaPath: s}, schema) {
+    let schemaProperty = _.get(schema, s)
+    let field = this.renderField(f)
+    let message = m
+    let extra = this.renderExtra(t, m, schemaProperty) || ""
+    return colors.errors.message(`Field ${field} ${message}. ${extra}`)
+  }
+
+
   renderField(field) {
     if (field.indexOf('data.') > -1) {
       field = field.replace('data.', '')
@@ -14,6 +29,7 @@ class ValidateView extends BaseView {
     }
     return colors.errors.field(field)
   }
+
 
   renderExtra(type, message, schemaProperty) {
     if (type && message !== "is required") {
@@ -24,12 +40,12 @@ class ValidateView extends BaseView {
       )
       return `${colors.plain('Expected type')} ${value}`
     } else if (message.indexOf('enum value') > -1) {
-      console.log("PROP", schemaProperty)
       let enumValues = schemaProperty.enum.map(JSON.stringify)
       let value = this.formatArray(enumValues, colors.errors.extra, colors.plain(', '))
       return `${colors.plain('Allowed values:')} ${value}`
     }
   }
+
 
   renderMessage({message: m, field: f, type: t, schemaPath: s, ...rest}) {
     let schemaProperty = _.get(this.__schema, s)
@@ -37,20 +53,6 @@ class ValidateView extends BaseView {
     let message = m
     let extra = this.renderExtra(t, m, schemaProperty) || ""
     return colors.errors.message(`Field ${field} ${message}. ${extra}`)
-  }
-
-  generate({valid, schema, errors}) {
-    let validMsg = valid ?
-      `${symbols.yes} The event is valid.` :
-      `${symbols.no} The event is invalid.`
-
-    this.__schema = schema
-
-    let errMsg = errors
-      .map(e => this.renderMessage(e))
-      .value()
-
-    return [validMsg, "", errMsg]
   }
 }
 

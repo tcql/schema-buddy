@@ -1,7 +1,6 @@
 const prompts = require('prompts')
 const {summarize} = require('../schema')
 const {render} = require('../view')
-// const SummarizeView = require('../views/SummarizeView')
 const {
   toCli,
   toInteractive,
@@ -24,6 +23,4 @@ exports.handler = async (argv) => {
 
   let summary = summarize(input.schema)
   render('summarize', {schema, summary})
-  // let view = new SummarizeView()
-  // view.render({schema, summary})
 }

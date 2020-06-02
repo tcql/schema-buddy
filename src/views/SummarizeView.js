@@ -4,8 +4,15 @@ const {
   symbols,
 } = require('../styling')
 
+// const Handlebars = require('handlebars')
+
 class SummarizeView extends BaseView {
-  title() {
+
+  get templateName() {
+    return "summarize"
+  }
+
+  "?title" () {
     return [
       'Schema Summary',
       '--------------',
@@ -13,12 +20,12 @@ class SummarizeView extends BaseView {
   }
 
 
-  sectionTitle(title) {
+  "?sectionTitle" (title) {
     return  colors.highlight(`[ ${title} ]`)
   }
 
 
-  metadata({key, value}) {
+  "?metadata" ({key, value}) {
     let keyFmt = colors.summary.metadata.key(key)
     let valueFmt = this.formatValue(
       value,
@@ -30,18 +37,7 @@ class SummarizeView extends BaseView {
   }
 
 
-  metadataSection(name, elements) {
-    let title = this.sectionTitle([name, "metadata"].join(" "))
-    let renderedElements = elements.map(e => this.metadata(e))
-
-    return [
-      title,
-      renderedElements,
-    ]
-  }
-
-
-  field({key, type, required}) {
+  "?field" ({key, type, required}) {
     let requiredCol = required ? symbols.yes : " "
     let fieldCol = colors.summary.fields.key(key)
     let typeCol = this.formatValue(
@@ -53,28 +49,6 @@ class SummarizeView extends BaseView {
     return `${requiredCol} ${fieldCol} ${typeCol}`
   }
 
-
-  fieldsSection(elements) {
-    let title = this.sectionTitle("fields")
-    let renderedElements = elements.map(e => this.field(e))
-
-    return [
-      title,
-      renderedElements,
-    ]
-  }
-
-
-  generate({schema, summary}) {
-    return [
-      this.title(),
-      this.metadataSection("core", summary.core),
-      "",
-      this.metadataSection("user", summary.user),
-      "",
-      this.fieldsSection(summary.fields),
-    ]
-  }
 }
 
 module.exports = SummarizeView
