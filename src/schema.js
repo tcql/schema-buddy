@@ -88,13 +88,14 @@ function summarize(schemaInfo) {
   // - handle displaying property dependencies
   // - dereferencing schema to get full properties
   // - traverse dependencies for additional properties
-  const props = _.chain(schema.properties)
+  const fields = _.chain(schema.properties)
     .map((prop, key) => ({ __key: key, ...prop }))
     .map(({enum: e, ...prop}) => ({ ...prop, __e: e ? e.map(JSON.stringify) : [] })) // enum -> quoted/"literal" values
     .map(({type: t, ...prop}) => ({ ...prop, __type: _.castArray(t) })) // cast type -> array of types, if not already
     .map(({__type: t, __e: e, ...prop}) => ({ ...prop, __type: e.length > 0 ? e : t })) // normalize (enum or type) -> type
     .map(({__key: k, ...prop}) => ({...prop, __key: k, __required: _.includes(required, k)})) // tag as required or not
-    .orderBy(['__required', '__key'], ['desc', 'asc'])
+    .map(({__key: key, __required: required, __type: type}) => ({key, required, type})) // remap to simplified object structure
+    .orderBy(['required', 'key'], ['desc', 'asc'])
 
   const {
     userProperties,
@@ -104,7 +105,7 @@ function summarize(schemaInfo) {
   return {
     core: coreProperties.value(),
     user: userProperties.value(),
-    fields: props.value()
+    fields: fields.value()
   }
 }
 

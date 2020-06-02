@@ -1,6 +1,7 @@
 const prompts = require('prompts')
 const {summarize} = require('../schema')
-const {render} = require('../templating')
+const {render} = require('../view')
+// const SummarizeView = require('../views/SummarizeView')
 const {
   toCli,
   toInteractive,
@@ -19,7 +20,10 @@ exports.builder = toCli(options)
 exports.description = "Summarize a schema"
 exports.handler = async (argv) => {
   const input = await askWithDefaults(argv, toInteractive(options))
+  const {schema} = input.schema
 
-  console.log(render('summarize', summarize(input.schema)))
-  summarize(input.schema)
+  let summary = summarize(input.schema)
+  render('summarize', {schema, summary})
+  // let view = new SummarizeView()
+  // view.render({schema, summary})
 }

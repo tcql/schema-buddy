@@ -16,6 +16,7 @@ const {
   askWithDefaults,
   schemaSelectInputs,
 } = require('../input')
+const ValidateView = require('../views/ValidateView')
 
 let selectInputs = schemaSelectInputs()
 
@@ -60,13 +61,7 @@ exports.handler = async (argv) => {
 
   let errors = _.chain(validator.errors)
     .sortBy('field')
-    .map(e => {
-      if (e.field.indexOf('data.') > -1) {
-        e.field = e.field.replace('data.', '')
-      } else if (e.field.indexOf('data[') > -1) {
-        e.field = e.field.replace(/data\["(.*?)"\]/, '$1')
-      }
-      return e
-    })
-    console.log(render("validation", {valid: tested, errors: errors}))
+
+  let view = new ValidateView()
+  view.render({valid: tested, errors: errors, schema: schema})
 }

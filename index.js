@@ -3,7 +3,7 @@
 const prompts = require('prompts')
 const _ = require('lodash')
 const yargs = require('yargs')
-const {init} = require('./src/templating')
+const {init} = require('./src/view')
 
 init()
 // process.exit()
