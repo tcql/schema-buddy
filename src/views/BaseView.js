@@ -14,11 +14,11 @@ function mergelines(data) {
   return _.flattenDeep(_.castArray(data)).join('\n')
 }
 
-function mapDeep(obj, kpath=null) {
+function keysDeep(obj, kpath=null) {
   return _.flatMap(obj, (v, k) => {
     let subpath = _.compact(_.concat(kpath, k))
     return _.isPlainObject(v) ?
-      mapDeep(v, subpath) :
+      keysDeep(v, subpath) :
       {key: k, value: v, path: kpath}
   })
 }
@@ -114,17 +114,9 @@ class BaseView {
 
     // Add color and symbol shortcut helpers under `$c:...`
     // and `$s:...` groupings.
-    generateWrapHelpers(this.hbs, 'c', mapDeep(colors))
-    generateWrapHelpers(this.hbs, 's', mapDeep(symbols))
+    generateWrapHelpers(this.hbs, 'c', keysDeep(colors))
+    generateWrapHelpers(this.hbs, 's', keysDeep(symbols))
 
-    // TODO: are these... good? defaults might be better.
-    _.assign(util.inspect.styles, {
-      name: 'cyan',
-      null: 'italic',
-      string: 'yellow',
-      special: 'magenta',
-      symbol: 'yellow',
-    })
 
     this.hbs.registerHelper('json', function() {
       return util.inspect(this, {

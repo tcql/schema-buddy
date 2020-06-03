@@ -1,5 +1,15 @@
 const kleur = require('kleur')
+const util = require('util')
 const _ = require('lodash')
+
+// TODO: are these... good? defaults might be better.
+_.assign(util.inspect.styles, {
+  name: 'cyan',
+  null: 'italic',
+  string: 'yellow',
+  special: 'magenta',
+  symbol: 'yellow',
+})
 
 // basic color/style mapping
 // every entry should be an un-called kleur function or chain.
@@ -24,7 +34,7 @@ const colors = {
     },
   },
 
-  // validation errors; todo: use general purpose
+  // validation errors
   errors: {
     message: kleur.italic().magenta,
     field: kleur.underline().cyan,
@@ -36,7 +46,6 @@ const colors = {
 const symbols = {
   check: '✔',
   cross: '✖',
-
   yes: kleur.green('✔'),
   no: kleur.red('✖'),
   listSeparator: colors.plain(' | ')

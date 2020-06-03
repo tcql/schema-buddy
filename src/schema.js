@@ -1,13 +1,6 @@
 const fs = require('fs')
 const split = require('binary-split')
 const _ = require('lodash')
-const kleur = require('kleur')
-const {
-  colors,
-  symbols,
-  summaryField,
-  headerProperty,
-} = require('./styling')
 
 
 function getSchemaId(schema) {
@@ -83,18 +76,28 @@ function summarize(schemaInfo) {
   const schema = schemaInfo.schema
   const {required} = schema
 
+  const tagKey = (prop, key) => ({key, ...prop})
+  const pickTypeOrEnum = ({enum: e, type: t, ...prop}) => {
+    // if we pick enum, we want to quote the values
+    // so we can indicate that they're literals
+    let type = e ? e.map(JSON.stringify) : t
+    type = _.castArray(type)
+    return {type, ...prop}
+  }
+  const tagRequired = ({key, ...prop}) => {
+    return {key, required: _.includes(required, key), ...prop}
+  }
+  const simplify = f => _.pick(f, ["key", "type", "required"])
+
   // TODO:
-  // - SIMPLIFY ?
   // - handle displaying property dependencies
   // - dereferencing schema to get full properties
   // - traverse dependencies for additional properties
   const fields = _.chain(schema.properties)
-    .map((prop, key) => ({ __key: key, ...prop }))
-    .map(({enum: e, ...prop}) => ({ ...prop, __e: e ? e.map(JSON.stringify) : [] })) // enum -> quoted/"literal" values
-    .map(({type: t, ...prop}) => ({ ...prop, __type: _.castArray(t) })) // cast type -> array of types, if not already
-    .map(({__type: t, __e: e, ...prop}) => ({ ...prop, __type: e.length > 0 ? e : t })) // normalize (enum or type) -> type
-    .map(({__key: k, ...prop}) => ({...prop, __key: k, __required: _.includes(required, k)})) // tag as required or not
-    .map(({__key: key, __required: required, __type: type}) => ({key, required, type})) // remap to simplified object structure
+    .map(tagKey)
+    .map(pickTypeOrEnum)
+    .map(tagRequired)
+    .map(simplify)
     .orderBy(['required', 'key'], ['desc', 'asc'])
 
   const {
