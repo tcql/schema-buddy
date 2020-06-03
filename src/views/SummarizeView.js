@@ -8,7 +8,6 @@ const {
 
 class SummarizeView extends BaseView {
 
-
   "?title" () {
     return [
       'Schema Summary',

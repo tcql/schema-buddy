@@ -14,6 +14,13 @@ let selectInputs = schemaSelectInputs()
 const options = {
   file: selectInputs.file,
   schema: selectInputs.schema,
+  items: {
+    cli: {
+      alias: 'i',
+      type: 'number',
+      default: 1
+    }
+  }
 }
 
 exports.builder = toCli(options)
@@ -24,8 +31,8 @@ exports.handler = async (argv) => {
   const exampleSchema = {
     type: 'array',
     items: input.schema,
-    minItems: 3,
-    maxItems: 3
+    minItems: input.items,
+    maxItems: input.items
   }
   await jsf.resolve(exampleSchema).then(examples => {
     render("example", {examples})

@@ -15,7 +15,10 @@ class ValidateView extends BaseView {
     return colors.errors.message(`Field ${field} ${message}. ${extra}`)
   }
 
-
+  // Cleans up validation formatting for the field name.
+  // is-my-json-valid writes field names like `data.xyz`
+  // (or `data["x-zy"]` for fields with invalid identifiers),
+  // but we want just the field name
   renderField(field) {
     if (field.indexOf('data.') > -1) {
       field = field.replace('data.', '')
@@ -25,7 +28,10 @@ class ValidateView extends BaseView {
     return colors.errors.field(field)
   }
 
-
+  // Handles "extra" messaging outside of what the validator returns
+  // as the message. We'll clean up the "type" formatting from the
+  // validator to to print out stylized mismatched type data, as well
+  // as pulling out and literal-wrapping enum values
   renderExtra(type, message, schemaProperty) {
     if (type && message !== "is required") {
       let value = this.formatValue(type,
@@ -41,14 +47,6 @@ class ValidateView extends BaseView {
     }
   }
 
-
-  renderMessage({message: m, field: f, type: t, schemaPath: s, ...rest}) {
-    let schemaProperty = _.get(this.__schema, s)
-    let field = this.renderField(f)
-    let message = m
-    let extra = this.renderExtra(t, m, schemaProperty) || ""
-    return colors.errors.message(`Field ${field} ${message}. ${extra}`)
-  }
 }
 
 module.exports = ValidateView

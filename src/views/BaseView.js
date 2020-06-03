@@ -3,13 +3,14 @@ const hbs = require('handlebars')
 const {
   colors,
   symbols,
-  formats
 } = require('../styling')
 const fs = require('fs')
 const path = require('path')
 const util = require('util')
 
-// this is weird here?
+// These utility functions are kind of weird just tossed in here.
+// Kind of think this might make more sense in a utility module
+// or exported into the view module
 function mergelines(data) {
   return _.flattenDeep(_.castArray(data)).join('\n')
 }
@@ -45,6 +46,20 @@ class BaseView {
   constructor(template) {
     this.init()
     this.templateName = template
+    this.templatesPath = path.resolve(__dirname, '../../templates/')
+  }
+
+  loadTemplate() {
+    // Allow creating templates inside the view,
+    // for ultra simple templates that don't require
+    // an external template file
+    if (typeof this.template === "function") {
+      return this.template()
+    }
+    let parts = this.templateName.split('.')
+    let toPath = path.join(...parts) + '.hbs'
+    let fullPath = path.join(this.templatesPath, toPath)
+    return fs.readFileSync(fullPath, 'utf-8')
   }
 
 
@@ -166,9 +181,12 @@ class BaseView {
   }
 
   render(ctx = {}) {
-    const p = path.resolve(path.join(__dirname, `../../templates/${this.templateName}.hbs`))
-    let content = fs.readFileSync(p, 'utf-8')
-    let tmpl = this.hbs.compile(content)
+    let tmpl = this._compiledView
+    if (!tmpl) {
+      let content = this.loadTemplate()
+      tmpl = this.hbs.compile(content)
+      this._compiledView = tmpl
+    }
     console.log(tmpl(ctx))
   }
 }
