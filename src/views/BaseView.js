@@ -1,32 +1,29 @@
-const _ = require('lodash')
-const hbs = require('handlebars')
-const {
-  colors,
-  symbols,
-} = require('../styling')
-const fs = require('fs')
-const path = require('path')
-const util = require('util')
+const _ = require("lodash")
+const hbs = require("handlebars")
+const { colors, symbols } = require("../styling")
+const fs = require("fs")
+const path = require("path")
+const util = require("util")
 
 // These utility functions are kind of weird just tossed in here.
 // Kind of think this might make more sense in a utility module
 // or exported into the view module
 function mergelines(data) {
-  return _.flattenDeep(_.castArray(data)).join('\n')
+  return _.flattenDeep(_.castArray(data)).join("\n")
 }
 
-function keysDeep(obj, kpath=null) {
+function keysDeep(obj, kpath = null) {
   return _.flatMap(obj, (v, k) => {
     let subpath = _.compact(_.concat(kpath, k))
-    return _.isPlainObject(v) ?
-      keysDeep(v, subpath) :
-      {key: k, value: v, path: kpath}
+    return _.isPlainObject(v)
+      ? keysDeep(v, subpath)
+      : { key: k, value: v, path: kpath }
   })
 }
 
 function generateWrapHelpers(handlebars, prefix, functionList) {
-  functionList.forEach(({key: k, value: v, path: p}) => {
-    let helperName = _.compact(_.concat(prefix, p, k)).join(':')
+  functionList.forEach(({ key: k, value: v, path: p }) => {
+    let helperName = _.compact(_.concat(prefix, p, k)).join(":")
     handlebars.registerHelper(`$${helperName}`, function (options) {
       if (!options) {
         return v(options)
@@ -46,7 +43,7 @@ class BaseView {
   constructor(template) {
     this.init()
     this.templateName = template
-    this.templatesPath = path.resolve(__dirname, '../../templates/')
+    this.templatesPath = path.resolve(__dirname, "../../templates/")
   }
 
   loadTemplate() {
@@ -56,12 +53,11 @@ class BaseView {
     if (typeof this.template === "function") {
       return this.template()
     }
-    let parts = this.templateName.split('.')
-    let toPath = path.join(...parts) + '.hbs'
+    let parts = this.templateName.split(".")
+    let toPath = path.join(...parts) + ".hbs"
     let fullPath = path.join(this.templatesPath, toPath)
-    return fs.readFileSync(fullPath, 'utf-8')
+    return fs.readFileSync(fullPath, "utf-8")
   }
-
 
   init() {
     this.hbs = hbs.create()
@@ -93,7 +89,7 @@ class BaseView {
     const self = this
     let prototype = Object.getPrototypeOf(this)
     let methods = Object.getOwnPropertyNames(prototype)
-      .filter(n => n.indexOf('?') === 0)
+      .filter(n => n.indexOf("?") === 0)
       .map(n => {
         self.hbs.registerHelper(n, function (...args) {
           let localContext = this
@@ -113,8 +109,7 @@ class BaseView {
           if (methodArgs.length < method.length) {
             if (_.has(localContext, rawProp)) {
               methodArgs.unshift(localContext[rawProp])
-            }
-            else if (_.has(opts.data.root, rawProp)) {
+            } else if (_.has(opts.data.root, rawProp)) {
               methodArgs.unshift(opts.data.root[rawProp])
             }
           }
@@ -129,12 +124,11 @@ class BaseView {
 
     // Add color and symbol shortcut helpers under `$c:...`
     // and `$s:...` groupings.
-    generateWrapHelpers(this.hbs, 'c', keysDeep(colors))
-    generateWrapHelpers(this.hbs, 's', keysDeep(symbols))
+    generateWrapHelpers(this.hbs, "c", keysDeep(colors))
+    generateWrapHelpers(this.hbs, "s", keysDeep(symbols))
 
-
-    this.hbs.registerHelper('json', function(...args) {
-      let content = (args.length > 1) ? _.head(args) : this
+    this.hbs.registerHelper("json", function (...args) {
+      let content = args.length > 1 ? _.head(args) : this
       return util.inspect(content, {
         colors: true,
         depth: null,
@@ -147,35 +141,38 @@ class BaseView {
     switch (t) {
       case "bool":
         return value ? symbols.yes : symbols.no
-        break;
+        break
       case "array":
         return this.formatArray(value, list_fmt, list_sep)
-        break;
+        break
       case "object":
       case "plainobject":
         return JSON.stringify(value)
-        break;
+        break
       default:
         return fmt(value)
     }
   }
 
-
   findFormatType(value) {
     const checks = [
-      {type: "array", fn: _.isArray},
-      {type: "bool", fn: _.isBoolean},
-      {type: "plainobject", fn: _.isPlainObject},
-      {type: "object", fn: _.isObject},
+      { type: "array", fn: _.isArray },
+      { type: "bool", fn: _.isBoolean },
+      { type: "plainobject", fn: _.isPlainObject },
+      { type: "object", fn: _.isObject },
       // types that aren't anything ^ are lumped into
       // "string" because they can be printed with no
       // extra formatting.
-      {type: "string", fn: _.constant(true)}
+      { type: "string", fn: _.constant(true) },
     ]
-    return _.reduce(checks, (t, c) => t || (c.fn(value) ? c.type : false), false)
+    return _.reduce(
+      checks,
+      (t, c) => t || (c.fn(value) ? c.type : false),
+      false
+    )
   }
 
-  formatArray (arr, itemStyle, separator = null) {
+  formatArray(arr, itemStyle, separator = null) {
     if (!separator) separator = symbols.listSeparator
     return arr.map(item => itemStyle(item)).join(separator)
   }
