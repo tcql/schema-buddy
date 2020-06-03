@@ -6,7 +6,7 @@ const yargs = require('yargs')
 const {init} = require('./src/view')
 
 init()
-// process.exit()
+
 yargs
   .options({})
   .command('*', 'Explore JSON schemas', () => {}, async argv => {

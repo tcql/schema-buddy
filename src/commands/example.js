@@ -27,14 +27,7 @@ exports.handler = async (argv) => {
     minItems: 3,
     maxItems: 3
   }
-  await jsf.resolve(exampleSchema).then(sample => {
-    // const warning = "Note: Example events *technically* conform to the JSON schema type "
-    // + "and formatting rules, but may not be representative of what real events look like.\n\n"
-    // + "If your schema only validates types and doesn't supply strict formatting, then the example "
-    // + "events may look strange (e.g. - dates as strings without strict formats may produce invalid dates)"
-
-    // console.log(kleur.magenta(warning))
-    // console.log(sample.map(e => e.schema))
-    render("example", {examples: sample.map(e => e.schema)})
+  await jsf.resolve(exampleSchema).then(examples => {
+    render("example", {examples})
   })
 }

@@ -118,8 +118,9 @@ class BaseView {
     generateWrapHelpers(this.hbs, 's', keysDeep(symbols))
 
 
-    this.hbs.registerHelper('json', function() {
-      return util.inspect(this, {
+    this.hbs.registerHelper('json', function(...args) {
+      let content = (args.length > 1) ? _.head(args) : this
+      return util.inspect(content, {
         colors: true,
         depth: null,
       })
