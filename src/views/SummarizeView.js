@@ -8,9 +8,6 @@ const {
 
 class SummarizeView extends BaseView {
 
-  get templateName() {
-    return "summarize"
-  }
 
   "?title" () {
     return [

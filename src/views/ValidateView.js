@@ -7,11 +7,6 @@ const {
 
 class ValidateView extends BaseView {
 
-  get templateName() {
-    return "validate"
-  }
-
-
   "?message" ({message: m, field: f, type: t, schemaPath: s}, schema) {
     let schemaProperty = _.get(schema, s)
     let field = this.renderField(f)

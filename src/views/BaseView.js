@@ -7,6 +7,7 @@ const {
 } = require('../styling')
 const fs = require('fs')
 const path = require('path')
+const util = require('util')
 
 // this is weird here?
 function mergelines(data) {
@@ -41,13 +42,11 @@ function generateWrapHelpers(handlebars, prefix, functionList) {
 }
 
 class BaseView {
-  constructor() {
+  constructor(template) {
     this.init()
+    this.templateName = template
   }
 
-  get templateName() {
-    throw new Error("Child class must specify template name")
-  }
 
   init() {
     this.hbs = hbs.create()
@@ -117,6 +116,22 @@ class BaseView {
     // and `$s:...` groupings.
     generateWrapHelpers(this.hbs, 'c', mapDeep(colors))
     generateWrapHelpers(this.hbs, 's', mapDeep(symbols))
+
+    // TODO: are these... good? defaults might be better.
+    _.assign(util.inspect.styles, {
+      name: 'cyan',
+      null: 'italic',
+      string: 'yellow',
+      special: 'magenta',
+      symbol: 'yellow',
+    })
+
+    this.hbs.registerHelper('json', function() {
+      return util.inspect(this, {
+        colors: true,
+        depth: null,
+      })
+    })
   }
 
   formatValue(value, fmt, list_fmt, list_sep) {

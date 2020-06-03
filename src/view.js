@@ -8,21 +8,46 @@ const {
 } = require('./styling')
 const glob = require('glob')
 
+// cache of loaded view classes
 const viewCache = {}
+
+// views that are available that
+// could be loadeded
 let availableViews = {}
+
+function pathToViewInfo(p, stripPattern=null) {
+  let n = path.parse(p).name
+  let name = _.kebabCase(n.replace(stripPattern, ""))
+  return {
+    path: p,
+    name: name,
+    template:name
+  }
+}
+
 
 function init() {
   const views = glob.sync(path.join(__dirname, 'views/**/*View.js'))
-  availableViews = views
-    .map(v => ({
-      path: v,
-      name: v.replace(/.*?\/(\w+)View\.js/, "$1").toLowerCase()
-    }))
-    .filter(v => v.name !== "base")
+  views
+    .map(v => pathToViewInfo(v, /View/))
     .reduce((acc, v) => {
       acc[v.name] = v
       return acc
-    }, {})
+    }, availableViews)
+
+  let baseViewPath = availableViews["base"].path
+
+  const templates = glob.sync(path.join(__dirname, '../templates/**/*.hbs'))
+  templates
+    .map(pathToViewInfo)
+    .map(v => _.assign(v, {'path': baseViewPath}))
+    .reduce((acc, v) => {
+      if (_.has(availableViews, v.name)) return acc
+      acc[v.name] = v
+      return acc
+    }, availableViews)
+
+  delete availableViews["base"]
 }
 
 
@@ -35,9 +60,9 @@ function load(viewname) {
     throw new Error(`No view named ${viewname}`)
   }
 
-  const {name, path: viewpath} = _.get(availableViews, viewname)
+  const {name, path: viewpath, template} = _.get(availableViews, viewname)
   const klass = require(viewpath)
-  _.set(viewCache, name, new klass())
+  _.set(viewCache, name, new klass(template))
   return _.get(viewCache, name)
 }
 
