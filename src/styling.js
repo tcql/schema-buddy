@@ -1,14 +1,14 @@
-const kleur = require('kleur')
-const util = require('util')
-const _ = require('lodash')
+const kleur = require("kleur")
+const util = require("util")
+const _ = require("lodash")
 
 // TODO: are these... good? defaults might be better.
 _.assign(util.inspect.styles, {
-  name: 'cyan',
-  null: 'italic',
-  string: 'yellow',
-  special: 'magenta',
-  symbol: 'yellow',
+  name: "cyan",
+  null: "italic",
+  string: "yellow",
+  special: "magenta",
+  symbol: "yellow",
 })
 
 // basic color/style mapping
@@ -26,7 +26,7 @@ const colors = {
     fields: {
       key: kleur.cyan,
       type: kleur.italic().yellow,
-      required: kleur.bold().cyan
+      required: kleur.bold().cyan,
     },
     metadata: {
       key: kleur.white,
@@ -38,19 +38,17 @@ const colors = {
   errors: {
     message: kleur.italic().magenta,
     field: kleur.underline().cyan,
-    extra: kleur.italic().yellow
-  }
+    extra: kleur.italic().yellow,
+  },
 }
-
 
 const symbols = {
-  check: '✔',
-  cross: '✖',
-  yes: kleur.green('✔'),
-  no: kleur.red('✖'),
-  listSeparator: colors.plain(' | ')
+  check: "✔",
+  cross: "✖",
+  yes: kleur.green("✔"),
+  no: kleur.red("✖"),
+  listSeparator: colors.plain(" | "),
 }
-
 
 module.exports = {
   colors,

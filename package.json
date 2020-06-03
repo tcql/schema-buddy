@@ -20,6 +20,10 @@
     "kleur": "^3.0.3",
     "lodash": "^4.17.15",
     "prompts": "^2.3.2",
+    "tap": "^14.10.7",
     "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "prettier": "2.0.5"
   }
 }

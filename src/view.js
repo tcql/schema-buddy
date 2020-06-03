@@ -1,12 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-const Handlebars = require('handlebars')
-const _ = require('lodash')
-const {
-  colors,
-  symbols,
-} = require('./styling')
-const glob = require('glob')
+const fs = require("fs")
+const path = require("path")
+const Handlebars = require("handlebars")
+const _ = require("lodash")
+const { colors, symbols } = require("./styling")
+const glob = require("glob")
 
 /**
   There are two assets related to rendering content:
@@ -40,8 +37,8 @@ const viewCache = {}
 // could be loadeded
 let availableViews = {}
 
-function pathToViewInfo(location, stripPattern=null) {
-  let {name, dir} = path.parse(location)
+function pathToViewInfo(location, stripPattern = null) {
+  let { name, dir } = path.parse(location)
 
   // apply the user supplied stripPattern
   // to clean up the the file name
@@ -55,7 +52,8 @@ function pathToViewInfo(location, stripPattern=null) {
   // becomes:
   //     folder-to.my-view.file
   //
-  let cleanedName = path.join(dir, stripped)
+  let cleanedName = path
+    .join(dir, stripped)
     .split("/")
     .map(_.kebabCase)
     .join(".")
@@ -63,19 +61,19 @@ function pathToViewInfo(location, stripPattern=null) {
   return {
     path: location,
     name: cleanedName,
-    template: cleanedName
+    template: cleanedName,
   }
 }
 
 function init() {
-  const viewsPath = path.join(__dirname, 'views')
-  const views = glob.sync('**/*View.js', {cwd: viewsPath})
+  const viewsPath = path.join(__dirname, "views")
+  const views = glob.sync("**/*View.js", { cwd: viewsPath })
   // View classes get assigned directly to `availableViews`
   views
     .map(v => pathToViewInfo(v, /View/))
     // convert the cwd-level path into a full path
     // so we can properly locate the view class
-    .map(v => _.assign(v, {'path': path.join(viewsPath, v.path)}))
+    .map(v => _.assign(v, { path: path.join(viewsPath, v.path) }))
     .reduce((acc, v) => {
       acc[v.name] = v
       return acc
@@ -86,8 +84,8 @@ function init() {
   // `render("base", ...)` anywhere in the code
   delete availableViews["base"]
 
-  const templatesPath = path.join(__dirname, '../templates')
-  const templates = glob.sync('**/*.hbs', {cwd: templatesPath})
+  const templatesPath = path.join(__dirname, "../templates")
+  const templates = glob.sync("**/*.hbs", { cwd: templatesPath })
   // Templates are only assigned if there already isn't
   // a matching View class. This lets us render templates
   // directly if they don't require any additional View
@@ -96,14 +94,13 @@ function init() {
     .map(pathToViewInfo)
     // View-less templates will always use the BaseView to
     // handle loading/rendering
-    .map(v => _.assign(v, {'path': baseViewPath}))
+    .map(v => _.assign(v, { path: baseViewPath }))
     .reduce((acc, v) => {
       if (_.has(availableViews, v.name)) return acc
       acc[v.name] = v
       return acc
     }, availableViews)
 }
-
 
 function load(viewname) {
   const view = _.get(viewCache, viewname)
@@ -114,17 +111,15 @@ function load(viewname) {
     throw new Error(`No view named ${viewname}`)
   }
 
-  const {name, path: viewpath, template} = _.get(availableViews, viewname)
+  const { name, path: viewpath, template } = _.get(availableViews, viewname)
   const klass = require(viewpath)
   _.set(viewCache, name, new klass(template))
   return _.get(viewCache, name)
 }
 
-
-function render(view, ctx={}) {
+function render(view, ctx = {}) {
   return load(view).render(ctx)
 }
-
 
 module.exports = {
   init,
