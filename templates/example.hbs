@@ -1,0 +1,14 @@
+{{#$c:highlight}}Note:{{/$c:highlight}}
+Example events *technically* conform to the JSON schema
+type and formatting rules, but may not be representative of what
+real events look like.
+
+If your schema only validates types and doesn't supply strict
+formatting, then the example events may look strange (e.g. - dates
+as strings without strict formats may produce invalid dates)
+
+{{#$c:highlight}}Examples:{{/$c:highlight}}
+{{#each examples}}
+
+{{{json schema}}}
+{{/each}}

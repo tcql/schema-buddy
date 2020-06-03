@@ -3,6 +3,9 @@
 const prompts = require('prompts')
 const _ = require('lodash')
 const yargs = require('yargs')
+const {init} = require('./src/view')
+
+init()
 
 yargs
   .options({})

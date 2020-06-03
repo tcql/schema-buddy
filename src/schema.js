@@ -1,13 +1,6 @@
 const fs = require('fs')
 const split = require('binary-split')
 const _ = require('lodash')
-const kleur = require('kleur')
-const {
-  colors,
-  symbols,
-  summaryField,
-  headerProperty,
-} = require('./styling')
 
 
 function getSchemaId(schema) {
@@ -46,8 +39,8 @@ async function load(schemafile) {
 function _sortedKeyPairs(obj) {
   return _.chain(obj)
     .toPairs()
-    .map(_.partial(_.zipObject, ['prop', 'value']))
-    .sortBy('prop')
+    .map(_.partial(_.zipObject, ['key', 'value']))
+    .sortBy('key')
 }
 
 function summaryHeaderProperties(schema) {
@@ -75,7 +68,6 @@ function summaryHeaderProperties(schema) {
 
   const coreProperties = _sortedKeyPairs(_.pick(schema, corePropNames))
   const userProperties = _sortedKeyPairs(_.omit(schema, nonUserPropNames))
-
   return {coreProperties, userProperties}
 }
 
@@ -84,53 +76,40 @@ function summarize(schemaInfo) {
   const schema = schemaInfo.schema
   const {required} = schema
 
+  const tagKey = (prop, key) => ({key, ...prop})
+  const pickTypeOrEnum = ({enum: e, type: t, ...prop}) => {
+    // if we pick enum, we want to quote the values
+    // so we can indicate that they're literals
+    let type = e ? e.map(JSON.stringify) : t
+    type = _.castArray(type)
+    return {type, ...prop}
+  }
+  const tagRequired = ({key, ...prop}) => {
+    return {key, required: _.includes(required, key), ...prop}
+  }
+  const simplify = f => _.pick(f, ["key", "type", "required"])
+
   // TODO:
-  // - SIMPLIFY ?
   // - handle displaying property dependencies
   // - dereferencing schema to get full properties
   // - traverse dependencies for additional properties
-
-  const props = _.chain(schema.properties)
-    .map((prop, key) => ({ __key: key, ...prop }))
-    .map(({enum: e, ...prop}) => ({ ...prop, __e: e ? e.map(JSON.stringify) : [] })) // enum -> quoted/"literal" values
-    .map(({type: t, ...prop}) => ({ ...prop, __type: _.castArray(t) })) // cast type -> array of types, if not already
-    .map(({__type: t, __e: e, ...prop}) => ({ ...prop, __type: e.length > 0 ? e : t })) // normalize (enum or type) -> type
-    .map(({__key: k, ...prop}) => ({...prop, __key: k, __required: _.includes(required, k)})) // tag as required or not
-
-  const propsPrintable = props
-    .orderBy(['__required', '__key'], ['desc', 'asc'])
-    .map(p => summaryField(p.__key, p.__type, p.__required))
-    .join('\n')
+  const fields = _.chain(schema.properties)
+    .map(tagKey)
+    .map(pickTypeOrEnum)
+    .map(tagRequired)
+    .map(simplify)
+    .orderBy(['required', 'key'], ['desc', 'asc'])
 
   const {
     userProperties,
     coreProperties
   } = summaryHeaderProperties(schema)
 
-  const corePropsPrintable = coreProperties
-    .map(({prop: p, value: v}) => headerProperty(p, v))
-    .join('\n')
-
-  const userPropsPrintable = userProperties
-    .map(({prop: p, value: v}) => headerProperty(p, v))
-    .join('\n')
-
-  // TODO:
-  // - use templating instead of a bunch of console.log'ing
-  // - handle if the schema itself is not valid
-  console.log('')
-  console.log(kleur.white().bold('Schema Summary'))
-  console.log(kleur.bold('--------------'))
-  console.log()
-  console.log(colors.highlight('[core metadata]'))
-  console.log(corePropsPrintable.value())
-  console.log()
-  console.log(colors.highlight('[user metadata]'))
-  console.log(userPropsPrintable.value())
-  console.log('')
-  console.log(colors.highlight('[fields]'))
-  console.log(propsPrintable.value())
-  console.log('')
+  return {
+    core: coreProperties.value(),
+    user: userProperties.value(),
+    fields: fields.value()
+  }
 }
 
 

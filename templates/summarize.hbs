@@ -1,0 +1,15 @@
+{{?title}}
+{{?sectionTitle "core metadata" }}
+{{#each summary.core}}
+{{?metadata}}
+{{/each}}
+
+{{?sectionTitle "user metadata" }}
+{{#each summary.user}}
+{{?metadata}}
+{{/each}}
+
+{{?sectionTitle "fields" }}
+{{#each summary.fields }}
+{{{?field}}}
+{{/each}}

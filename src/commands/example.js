@@ -1,7 +1,7 @@
 const prompts = require('prompts')
-const {summarize} = require('../schema')
 const kleur = require('kleur')
 const jsf = require('json-schema-faker')
+const {render} = require('../view')
 const {
   toCli,
   toInteractive,
@@ -14,6 +14,13 @@ let selectInputs = schemaSelectInputs()
 const options = {
   file: selectInputs.file,
   schema: selectInputs.schema,
+  items: {
+    cli: {
+      alias: 'i',
+      type: 'number',
+      default: 1
+    }
+  }
 }
 
 exports.builder = toCli(options)
@@ -24,16 +31,10 @@ exports.handler = async (argv) => {
   const exampleSchema = {
     type: 'array',
     items: input.schema,
-    minItems: 3,
-    maxItems: 3
+    minItems: input.items,
+    maxItems: input.items
   }
-  await jsf.resolve(exampleSchema).then(sample => {
-    const warning = "Note: Example events *technically* conform to the JSON schema type "
-    + "and formatting rules, but may not be representative of what real events look like.\n\n"
-    + "If your schema only validates types and doesn't supply strict formatting, then the example "
-    + "events may look strange (e.g. - dates as strings without strict formats may produce invalid dates)"
-
-    console.log(kleur.magenta(warning))
-    console.log(sample.map(e => e.schema))
+  await jsf.resolve(exampleSchema).then(examples => {
+    render("example", {examples})
   })
 }
