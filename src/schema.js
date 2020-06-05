@@ -2,12 +2,21 @@ const fs = require("fs")
 const split = require("binary-split")
 const _ = require("lodash")
 
-function getSchemaId(schema) {
-  return (
-    schema["$id"] ||
-    schema["schema"] ||
-    [schema["name"], schema["version"]].join("-")
-  )
+function getName(schema) {
+  return findInSchema(schema, ["$id", "id", "schema", "name"])
+}
+
+function getVersion(schema) {
+  return findInSchema(schema, ["$version", "version"])
+}
+
+function findInSchema(schema, keys) {
+  return _.chain(keys)
+    .map(_.curry(_.pick, 2)(schema))
+    .filter(_.negate(_.isEmpty))
+    .flatMap(_.values)
+    .first()
+    .value()
 }
 
 // todo: read from other streams than a file, maybe?
@@ -19,10 +28,13 @@ async function load(schemafile) {
       .pipe(split())
       .on("data", l => {
         let schema = JSON.parse(l.toString())
-        let id = getSchemaId(schema)
+        let name = getName(schema)
+        let version = getVersion(schema)
+        let id = _.compact([name, version]).join("-")
         availableSchemas.push({
           $id: id,
-          version: schema["version"],
+          $version: version,
+          $name: name,
           schema: schema,
         })
       })
@@ -111,4 +123,6 @@ function summarize(schemaInfo) {
 module.exports = {
   load,
   summarize,
+  getName,
+  getVersion,
 }

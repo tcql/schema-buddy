@@ -1,0 +1,15 @@
+{
+  "schema": {
+    "$id": "myschema",
+    "$schema": "http://json-schema.org/schema#",
+    "title": "myschema, v1",
+    "description": "this is my schema!",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": true
+  }
+}

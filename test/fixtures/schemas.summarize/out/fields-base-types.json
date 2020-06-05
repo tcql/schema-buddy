@@ -1,0 +1,26 @@
+{
+  "core": [],
+  "user": [],
+  "fields": [
+    {
+      "key": "age",
+      "type": ["number"],
+      "required": false
+    },
+    {
+      "key": "height",
+      "type": ["number", "null"],
+      "required": false
+    },
+    {
+      "key": "name",
+      "type": ["string"],
+      "required": false
+    },
+    {
+      "key": "on_earth",
+      "type": ["boolean"],
+      "required": false
+    }
+  ]
+ }

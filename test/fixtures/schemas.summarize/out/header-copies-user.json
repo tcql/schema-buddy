@@ -1,0 +1,25 @@
+{
+  "core": [
+    {
+      "key": "$id",
+      "value": "myschema"
+    }
+  ],
+  "user": [
+    {
+      "key": "isPublic",
+      "value": true
+    },
+    {
+      "key": "status",
+      "value": "ACTIVE"
+    }
+  ],
+  "fields": [
+    {
+      "key": "name",
+      "type": ["string"],
+      "required": false
+    }
+  ]
+}

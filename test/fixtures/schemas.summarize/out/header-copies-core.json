@@ -1,0 +1,32 @@
+{
+  "core": [
+    {
+      "key": "$id",
+      "value": "myschema"
+    },
+    {
+      "key": "$schema",
+      "value": "http://json-schema.org/schema#"
+    },
+    {
+      "key": "additionalProperties",
+      "value": true
+    },
+    {
+      "key": "description",
+      "value": "this is my schema!"
+    },
+    {
+      "key": "title",
+      "value": "myschema, v1"
+    }
+  ],
+  "user": [],
+  "fields": [
+    {
+      "key": "name",
+      "type": ["string"],
+      "required": false
+    }
+  ]
+}

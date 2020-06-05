@@ -1,0 +1,13 @@
+{
+  "schema": {
+    "$id": "myschema",
+    "isPublic": true,
+    "status": "ACTIVE",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    }
+  }
+}

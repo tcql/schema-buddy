@@ -1,0 +1,19 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "age": {
+        "type": "number"
+      },
+      "height": {
+        "type": ["number", "null"]
+      },
+      "on_earth": {
+        "type": "boolean"
+      }
+    }
+  }
+}

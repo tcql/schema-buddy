@@ -1,0 +1,11 @@
+{
+  "core": [],
+  "user": [],
+  "fields": [
+    {
+      "key": "name",
+      "type": ["string"],
+      "required": false
+    }
+  ]
+}

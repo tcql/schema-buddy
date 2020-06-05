@@ -1,0 +1,21 @@
+{
+  "core": [],
+  "user": [],
+  "fields": [
+    {
+      "key": "age",
+      "type": ["number"],
+      "required": false
+    },
+    {
+      "key": "name",
+      "type": ["string"],
+      "required": false
+    },
+    {
+      "key": "shirt_color",
+      "type": ["\"red\"", "\"gold\"", "\"blue\""],
+      "required": false
+    }
+  ]
+ }

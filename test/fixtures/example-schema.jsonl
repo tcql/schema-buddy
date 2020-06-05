@@ -1,0 +1,2 @@
+{"name":"example","version":"1.1","type":"object","description":"an example schema","properties":{"role":{"enum":["user","admin"]},"name":{"type":"string"},"age":{"type":"number"},"favorite_color":{"type":["string","null"]}},"required":["name","age"],"additionalProperties":false,"customTagging":["event","example","not very useful"]}
+{"$id":"second-schema","type":"object","properties":{}}
