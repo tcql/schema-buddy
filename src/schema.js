@@ -10,6 +10,15 @@ function getVersion(schema) {
   return findInSchema(schema, ["$version", "version"])
 }
 
+function getId(name, version) {
+  if (!version) {
+    return name
+  } else if (name.indexOf(`-${version}`) > -1) {
+    return name
+  }
+  return _.compact([name, version]).join("-")
+}
+
 function findInSchema(schema, keys) {
   return _.chain(keys)
     .map(_.curry(_.pick, 2)(schema))
@@ -30,7 +39,7 @@ async function load(schemafile) {
         let schema = JSON.parse(l.toString())
         let name = getName(schema)
         let version = getVersion(schema)
-        let id = _.compact([name, version]).join("-")
+        let id = getId(name, version)
         availableSchemas.push({
           $id: id,
           $version: version,
@@ -125,4 +134,5 @@ module.exports = {
   summarize,
   getName,
   getVersion,
+  getId,
 }

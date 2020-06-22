@@ -46,6 +46,17 @@ test("schema -- getVersion", t => {
   t.end()
 })
 
+test("schema -- getId", t => {
+  let no_version = schema.getId("schema_a")
+  let version_in_name = schema.getId("schema_a-2.1", "2.1")
+  let name_plus_version = schema.getId("schema_a", "2.1")
+
+  t.equal("schema_a", no_version)
+  t.equal("schema_a-2.1", version_in_name)
+  t.equal("schema_a-2.1", name_plus_version)
+  t.end()
+})
+
 test("load", async t => {
   let schemas = await schema.load(
     path.resolve("./test/fixtures/example-schema.jsonl")
